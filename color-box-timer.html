@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>色弱遊戲</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Helvetica", "Arial", "LiHei Pro", "黑體-繁", "微軟正黑體", sans-serif;
+        }
+
+        h1 {
+            color: rgb(255, 233, 233);
+            font-size: 80px;
+        }
+
+        button,
+        .timer {
+            width: 100px;
+            height: 50px;
+            background-color: rgb(255, 236, 222);
+            border: 3px solid rgb(255, 233, 233);
+            color: #f06060;
+            font-size: 25px;
+            font-weight: 600;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .timer {
+            line-height: 50px;
+            text-align: center;
+
+        }
+
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        .game-page,
+        .home-page {
+            width: 100%;
+            height: 100vh;
+
+            background-color: #f06060;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .home-page {
+            flex-direction: column;
+        }
+
+        .game-page {
+            display: none;
+        }
+
+        .box-big {
+            width: 520px;
+            height: 520px;
+            background-color: rgb(255, 233, 233);
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            border-radius: 10px;
+        }
+
+        .box {
+
+            background-color: #ffffff;
+            border: 5px solid rgb(255, 233, 233);
+            border-radius: 10px;
+        }
+
+        .game {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .btn {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-left: 20px;
+        }
+
+        .answer {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="home-page">
+        <h1>色弱遊戲</h1>
+        <button class="start">開始</button>
+    </div>
+    <div class="game-page">
+        <div class="game">
+            <div class="box-big"></div>
+        </div>
+        <div class="btn">
+            <div class="timer">60</div>
+            <button class="pause">暫停</button>
+            <button class="continue-game">繼續</button>
+            <button class="give-up">放棄</button>
+        </div>
+
+
+    </div>
+
+
+
+    <script>
+        let start = document.querySelector('.start');
+        let pause = document.querySelector('.pause');
+        let continueGame = document.querySelector('.continue-game');
+        let giveUp = document.querySelector('.give-up');
+        let homePage = document.querySelector('.home-page');
+        let gamePage = document.querySelector('.game-page');
+        let seconds = 60;
+
+        start.addEventListener('click', () => {
+            timer.innerHTML = seconds;
+            seconds = 60;
+            timerMachine = setInterval(countDown, 1000)
+            homePage.style.display = 'none';
+            gamePage.style.display = 'flex';
+
+        })
+        pause.addEventListener('click', () => {
+            clearInterval(timerMachine);
+        })
+        continueGame.addEventListener('click', () => {
+            clearInterval(timerMachine);
+            timerMachine = setInterval(countDown, 1000)
+
+        })
+        giveUp.addEventListener('click', () => {
+            clearInterval(timerMachine);
+            seconds = 60;
+            homePage.style.display = 'flex';
+            gamePage.style.display = 'none';
+        })
+
+        //關卡
+        let level = 1;
+        //盒子大小
+        let size = 100 / level;
+        //計算過關次數
+        let gameCount = 0;
+
+        const boxBig = document.querySelector('.box-big');
+        let timer = document.querySelector('.timer')
+
+        // 呼叫game的function
+        game();
+        // game function的定義
+        function game() {
+
+            //產生隨機顏色
+            let r = Math.floor(Math.random() * 256);
+            let g = Math.floor(Math.random() * 256);
+            let b = Math.floor(Math.random() * 256);
+            let color = `rgb(${r},${g},${b})`;
+            let randomAnswer = Math.floor(Math.random() * level ** 2 + 1);
+            boxBig.innerHTML = '';
+
+            for (let i = 0; i < level ** 2; i++) {
+                boxBig.innerHTML = boxBig.innerHTML + `<div class="box" style="width:${size}%; height: ${size}%; background-color: ${color};"></div>`;
+            }
+            let answer = document.querySelector(`.box:nth-of-type(${randomAnswer})`);
+            answer.classList.add('answer');
+            answer.style.opacity = `${0.5 + level * 0.02}`;
+
+            answer.addEventListener('click', function () {
+                gameCount++;
+                if (gameCount == level) {
+                    level++;
+                    size = 100 / level;
+                }
+                //呼叫自己
+                game();
+            })
+        }
+
+        function countDown() {
+            timer.innerHTML = seconds;
+            console.log(seconds, '計時中');
+            seconds--;
+            if (seconds < 0) {
+                alert('時間到了！');
+                clearInterval(timerMachine);
+                seconds = 60;
+                homePage.style.display = 'flex';
+                gamePage.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
